@@ -1,0 +1,164 @@
+<div class="admin-shell">
+  <!-- Top Bar -->
+  <header class="admin-topbar">
+    <div class="admin-topbar__title">
+      <span class="badge-admin">Admin</span>
+      <h1>Painel de Controle do Estoque</h1>
+    </div>
+
+    <div class="admin-topbar__actions">
+      <span class="user-greeting" *ngIf="auth.userName()">
+        👤 {{ auth.userName() }}
+      </span>
+      <a routerLink="/" class="btn-secondary">Ir para o Site Público</a>
+      <button type="button" class="btn-logout" (click)="logout()">Sair</button>
+    </div>
+  </header>
+
+  <!-- Error Alert -->
+  <div class="alert-error" *ngIf="errorMessage() as err">
+    ⚠️ {{ err }}
+    <button type="button" (click)="loadDashboard()" class="btn-retry">Tentar novamente</button>
+  </div>
+
+  <!-- KPI Cards -->
+  <section class="kpi-grid" *ngIf="dashboard() as dash">
+    <div class="kpi-card">
+      <span class="kpi-label">Total Cadastrado</span>
+      <strong class="kpi-value">{{ dash.total }}</strong>
+      <span class="kpi-sub">veículos no sistema</span>
+    </div>
+
+    <div class="kpi-card kpi-card--highlighted">
+      <span class="kpi-label">Destaques Vitrine</span>
+      <strong class="kpi-value">{{ dash.highlighted }}</strong>
+      <span class="kpi-sub">exibidos no topo</span>
+    </div>
+
+    <div class="kpi-card kpi-card--published">
+      <span class="kpi-label">Publicados / Ativos</span>
+      <strong class="kpi-value">{{ dash.published }}</strong>
+      <span class="kpi-sub">visíveis ao público</span>
+    </div>
+  </section>
+
+  <!-- Toolbar de Ações e Filtros -->
+  <section class="inventory-toolbar">
+    <form class="search-form" (ngSubmit)="applySearch()">
+      <div class="input-search-wrapper">
+        <span>🔍</span>
+        <input
+          type="text"
+          placeholder="Buscar por título, marca ou modelo..."
+          [(ngModel)]="searchText"
+          name="searchText"
+        />
+      </div>
+
+      <select [(ngModel)]="statusFilter" name="statusFilter" (change)="applySearch()">
+        <option value="">Todos os status</option>
+        <option value="PUBLISHED">Publicado</option>
+        <option value="DRAFT">Rascunho</option>
+        <option value="SOLD">Vendido</option>
+        <option value="ARCHIVED">Arquivado</option>
+      </select>
+
+      <button type="submit" class="btn-search">Buscar</button>
+    </form>
+
+    <button type="button" class="btn-new-vehicle" (click)="openCreateModal()">
+      + Novo Veículo
+    </button>
+  </section>
+
+  <!-- Tabela de Inventário -->
+  <section class="inventory-card">
+    <div class="loading-box" *ngIf="isLoading()">
+      <p>Atualizando estoque...</p>
+    </div>
+
+    <div class="table-responsive" *ngIf="!isLoading() && dashboard() as dash">
+      <table class="inventory-table" *ngIf="dash.vehicles.length > 0">
+        <thead>
+          <tr>
+            <th>Veículo</th>
+            <th>Preço</th>
+            <th>Destaque</th>
+            <th>Status</th>
+            <th class="text-right">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of dash.vehicles">
+            <td class="vehicle-cell">
+              <img
+                [src]="item.coverImageUrl | imageUrl"
+                [alt]="item.title"
+                class="cell-thumb"
+                (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
+              />
+              <div class="cell-info">
+                <strong>{{ item.title }}</strong>
+                <span class="cell-slug">/detail/{{ item.slug }}</span>
+              </div>
+            </td>
+
+            <td>
+              <strong class="cell-price">{{ item.price | euro }}</strong>
+            </td>
+
+            <td>
+              <span class="badge-featured-mini" *ngIf="item.featured">★ Sim</span>
+              <span class="badge-not-featured" *ngIf="!item.featured">—</span>
+            </td>
+
+            <td>
+              <select
+                class="status-select"
+                [ngModel]="item.status"
+                (ngModelChange)="updateVehicleStatus(item, $event)"
+              >
+                <option value="PUBLISHED">Publicado</option>
+                <option value="DRAFT">Rascunho</option>
+                <option value="SOLD">Vendido</option>
+                <option value="ARCHIVED">Arquivado</option>
+              </select>
+            </td>
+
+            <td class="text-right">
+              <div class="action-buttons">
+                <a [routerLink]="['/detail', item.slug]" target="_blank" class="btn-view" title="Ver no site">
+                  👁️
+                </a>
+                <button
+                  type="button"
+                  class="btn-edit"
+                  (click)="openEditModal(item.id)"
+                >
+                  ✏️ Editar
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Empty State -->
+      <div class="empty-inventory" *ngIf="dash.vehicles.length === 0">
+        <p>Nenhum veículo encontrado com os filtros atuais.</p>
+        <button type="button" class="btn-new-vehicle" (click)="openCreateModal()">
+          Cadastrar o Primeiro Veículo
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal de Criação / Edição -->
+  <app-admin-vehicle-modal
+    [isOpen]="isModalOpen"
+    [vehicleId]="selectedVehicleId"
+    (closed)="closeModal()"
+    (saved)="onModalSaved()"
+  ></app-admin-vehicle-modal>
+</div>
+

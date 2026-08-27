@@ -1,0 +1,64 @@
+<div class="app-layout">
+  <!-- Header Global -->
+  <header class="app-header">
+    <div class="header-container">
+      <a routerLink="/" class="brand-logo">
+        <span class="logo-badge">STAND</span>
+        <span class="logo-text">AutoMotors</span>
+      </a>
+
+      <nav class="main-nav">
+        <a routerLink="/" routerLinkActive="nav-link--active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
+          Estoque
+        </a>
+
+        <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
+          <a routerLink="/admin" routerLinkActive="nav-link--active" class="nav-link nav-link--admin">
+            Painel Admin
+          </a>
+          <button type="button" class="btn-header-logout" (click)="logout()">
+            Sair
+          </button>
+        </ng-container>
+
+        <ng-template #loginLink>
+          <a routerLink="/admin/login" class="btn-header-admin">
+            🔒 Área Restrita
+          </a>
+        </ng-template>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal com Router Outlet -->
+  <main class="app-main">
+    <div class="content-wrapper">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+
+  <!-- Footer Global -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <strong>STAND AutoMotors</strong>
+          <p>Revenda de Veículos Seminovos e Selecionados</p>
+        </div>
+      </div>
+
+      <div class="footer-status">
+        <div class="status-pill" [class.status-pill--online]="isBackendOnline() === true" [class.status-pill--offline]="isBackendOnline() === false">
+          <span class="status-dot"></span>
+          <span *ngIf="isBackendOnline() === true">Backend Conectado (API 8080)</span>
+          <span *ngIf="isBackendOnline() === false">Backend Offline</span>
+          <span *ngIf="isBackendOnline() === null">Verificando API...</span>
+        </div>
+
+        <a href="http://localhost:8080/swagger-ui/index.html" target="_blank" rel="noopener noreferrer" class="swagger-link">
+          📄 Documentação Swagger UI
+        </a>
+      </div>
+    </div>
+  </footer>
+</div>

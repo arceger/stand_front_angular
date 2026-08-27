@@ -1,0 +1,277 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="closeModal()">
+  <div class="modal-dialog" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ vehicleId ? 'Editar Veículo' : 'Cadastrar Novo Veículo' }}</h2>
+      <button type="button" class="btn-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <!-- Error Alert -->
+    <div class="alert-error" *ngIf="errorMessage() as err">
+      ⚠️ {{ err }}
+    </div>
+
+    <div class="modal-body" *ngIf="isLoading()">
+      <p class="loading-text">Carregando dados do veículo...</p>
+    </div>
+
+    <form (ngSubmit)="saveVehicle()" class="modal-form" *ngIf="!isLoading()">
+      <!-- Linha 1: Título e Marca -->
+      <div class="form-row">
+        <div class="form-group flex-2">
+          <label for="form-title">Título do Anúncio *</label>
+          <input
+            id="form-title"
+            type="text"
+            [(ngModel)]="formData.title"
+            name="title"
+            placeholder="Ex: BMW 320i M Sport 2.0 Turbo"
+            required
+          />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="form-brand">Marca *</label>
+          <input
+            id="form-brand"
+            type="text"
+            [(ngModel)]="formData.brand"
+            name="brand"
+            placeholder="Ex: BMW"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Linha 2: Modelo, Versão e Preço -->
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="form-model">Modelo *</label>
+          <input
+            id="form-model"
+            type="text"
+            [(ngModel)]="formData.model"
+            name="model"
+            placeholder="Ex: 320i"
+            required
+          />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="form-version">Versão</label>
+          <input
+            id="form-version"
+            type="text"
+            [(ngModel)]="formData.version"
+            name="version"
+            placeholder="Ex: 2.0 16V M Sport"
+          />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="form-price">Preço (€) *</label>
+          <input
+            id="form-price"
+            type="number"
+            [(ngModel)]="formData.price"
+            name="price"
+            placeholder="289900"
+            required
+          />
+        </div>
+      </div>
+
+      <!-- Linha 3: Anos, KM e Portas -->
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="form-year">Ano Fabricação *</label>
+          <input
+            id="form-year"
+            type="number"
+            [(ngModel)]="formData.year"
+            name="year"
+            required
+          />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="form-model-year">Ano Modelo *</label>
+          <input
+            id="form-model-year"
+            type="number"
+            [(ngModel)]="formData.modelYear"
+            name="modelYear"
+            required
+          />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="form-mileage">Quilometragem (km) *</label>
+          <input
+            id="form-mileage"
+            type="number"
+            [(ngModel)]="formData.mileage"
+            name="mileage"
+            required
+          />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="form-doors">Portas</label>
+          <input
+            id="form-doors"
+            type="number"
+            [(ngModel)]="formData.doors"
+            name="doors"
+          />
+        </div>
+      </div>
+
+      <!-- Linha 4: Câmbio, Combustível, Cor e Status -->
+      <div class="form-row">
+        <div class="form-group flex-1">
+          <label for="form-trans">Câmbio *</label>
+          <select id="form-trans" [(ngModel)]="formData.transmission" name="transmission">
+            <option value="AUTOMATIC">Automático</option>
+            <option value="MANUAL">Manual</option>
+          </select>
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="form-fuel">Combustível *</label>
+          <select id="form-fuel" [(ngModel)]="formData.fuelType" name="fuelType">
+            <option value="FLEX">Flex</option>
+            <option value="GASOLINE">Gasolina</option>
+            <option value="DIESEL">Diesel</option>
+            <option value="HYBRID">Híbrido</option>
+            <option value="ELECTRIC">Elétrico</option>
+          </select>
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="form-color">Cor</label>
+          <input
+            id="form-color"
+            type="text"
+            [(ngModel)]="formData.color"
+            name="color"
+            placeholder="Ex: Preto"
+          />
+        </div>
+
+        <div class="form-group flex-1">
+          <label for="form-status">Status *</label>
+          <select id="form-status" [(ngModel)]="formData.status" name="status">
+            <option value="PUBLISHED">Publicado (Disponível)</option>
+            <option value="DRAFT">Rascunho</option>
+            <option value="SOLD">Vendido</option>
+            <option value="ARCHIVED">Arquivado</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Destaques e Checkbox Featured -->
+      <div class="form-row">
+        <div class="form-group flex-3">
+          <label for="form-highlights">Destaques e Opcionais</label>
+          <input
+            id="form-highlights"
+            type="text"
+            [(ngModel)]="formData.highlights"
+            name="highlights"
+            placeholder="Ex: Teto solar, Bancos em couro, Painel digital"
+          />
+        </div>
+
+        <div class="form-group flex-1 checkbox-group">
+          <label>
+            <input
+              type="checkbox"
+              [(ngModel)]="formData.featured"
+              name="featured"
+            />
+            Destaque na Vitrine
+          </label>
+        </div>
+      </div>
+
+      <!-- Descrição -->
+      <div class="form-group">
+        <label for="form-description">Descrição Detalhada *</label>
+        <textarea
+          id="form-description"
+          rows="3"
+          [(ngModel)]="formData.description"
+          name="description"
+          placeholder="Descreva o histórico, conservação e diferenciais do veículo..."
+          required
+        ></textarea>
+      </div>
+
+      <!-- Gerenciamento de Fotos (Modo Edição) -->
+      <div class="gallery-manager" *ngIf="vehicleId">
+        <div class="gallery-manager__header">
+          <h3>Fotos da Galeria</h3>
+          <label class="btn-upload">
+            <span *ngIf="!isUploading()">📷 Adicionar Fotos</span>
+            <span *ngIf="isUploading()">Enviando...</span>
+            <input
+              type="file"
+              multiple
+              accept="image/jpeg,image/png,image/webp"
+              (change)="onFilesSelected($event)"
+              [disabled]="isUploading()"
+              style="display: none"
+            />
+          </label>
+        </div>
+
+        <div class="gallery-grid" *ngIf="galleryImages().length > 0">
+          <div class="gallery-item" *ngFor="let img of galleryImages()">
+            <img
+              [src]="img.imageUrl | imageUrl"
+              [alt]="formData.title"
+              (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
+            />
+            <span class="cover-badge" *ngIf="img.cover">Capa Principal</span>
+
+            <div class="gallery-actions">
+              <button
+                type="button"
+                class="btn-action btn-action--cover"
+                *ngIf="!img.cover"
+                (click)="setAsCover(img.id)"
+                title="Definir como capa principal"
+              >
+                ⭐ Capa
+              </button>
+              <button
+                type="button"
+                class="btn-action btn-action--delete"
+                (click)="deleteImage(img.id)"
+                title="Excluir foto"
+              >
+                🗑️
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <p class="gallery-empty" *ngIf="galleryImages().length === 0 && !isUploading()">
+          Nenhuma imagem cadastrada ainda. Clique em "Adicionar Fotos" acima.
+        </p>
+      </div>
+
+      <!-- Footer do Modal -->
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel" (click)="closeModal()" [disabled]="isSaving()">
+          Cancelar
+        </button>
+        <button type="submit" class="btn-save" [disabled]="isSaving()">
+          <span *ngIf="!isSaving()">Salvar Veículo</span>
+          <span *ngIf="isSaving()">Salvando...</span>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

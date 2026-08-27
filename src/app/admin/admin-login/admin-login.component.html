@@ -1,0 +1,49 @@
+<div class="login-wrapper">
+  <div class="login-card">
+    <div class="login-header">
+      <span class="badge-lock">🔒 Gestão de Estoque</span>
+      <h1>Acesso Administrativo</h1>
+      <p>Entre com suas credenciais para gerenciar veículos e propostas.</p>
+    </div>
+
+    <div class="alert-error" *ngIf="errorMessage() as err">
+      ⚠️ {{ err }}
+    </div>
+
+    <form (ngSubmit)="submitLogin()" class="login-form">
+      <div class="form-group">
+        <label for="login-email">E-mail</label>
+        <input
+          id="login-email"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="admin@stand.local"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">Senha</label>
+        <input
+          id="login-password"
+          type="password"
+          [(ngModel)]="password"
+          name="password"
+          placeholder="••••••••"
+          required
+        />
+      </div>
+
+      <button type="submit" class="btn-login" [disabled]="isLoading()">
+        <span *ngIf="!isLoading()">Entrar no Painel</span>
+        <span *ngIf="isLoading()">Autenticando...</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <a routerLink="/" class="btn-back">&larr; Voltar para o site público</a>
+    </div>
+  </div>
+</div>
+

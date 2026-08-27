@@ -1,0 +1,201 @@
+<section class="home-container">
+  <!-- Destaque Principal / Hero Card -->
+  <section class="hero-section" *ngIf="mainFeatured() as hero">
+    <div class="hero-card">
+      <div class="hero-card__media">
+        <img
+          [src]="hero.coverImageUrl | imageUrl"
+          [alt]="hero.title"
+          class="hero-card__img"
+          (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
+        />
+        <span class="badge-featured" *ngIf="hero.featured">★ Destaque</span>
+      </div>
+
+      <div class="hero-card__info">
+        <div class="hero-card__header">
+          <span class="vehicle-status">{{ hero.status === 'PUBLISHED' ? 'Disponível' : hero.status }}</span>
+          <span class="vehicle-brand">{{ hero.brand }}</span>
+        </div>
+
+        <h1 class="hero-card__title">{{ hero.title }}</h1>
+        <p class="hero-card__meta">
+          <span>Ano: {{ hero.year }}/{{ hero.modelYear }}</span>
+          <span>•</span>
+          <span>{{ formatMileage(hero.mileage) }}</span>
+          <span>•</span>
+          <span>{{ formatTransmission(hero.transmission) }}</span>
+          <span>•</span>
+          <span>{{ formatFuel(hero.fuelType) }}</span>
+        </p>
+
+        <p class="hero-card__highlights" *ngIf="hero.highlights">
+          {{ hero.highlights }}
+        </p>
+
+        <div class="hero-card__footer">
+          <div class="price-container">
+            <span class="price-label">Preço à vista</span>
+            <strong class="price-value">{{ hero.price | euro: hero.rawPrice }}</strong>
+          </div>
+          <a [routerLink]="['/detail', hero.slug]" class="btn-cta">
+            Ver detalhes completos &rarr;
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Barra de Filtros e Busca -->
+  <section class="filter-section">
+    <form class="filter-bar" (ngSubmit)="applyFilters()">
+      <div class="filter-group filter-group--search">
+        <label for="search-input">Buscar veículo</label>
+        <div class="input-icon-wrapper">
+          <span class="icon">🔍</span>
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Ex: BMW, Civic, Turbo..."
+            [ngModel]="searchText()"
+            (ngModelChange)="searchText.set($event)"
+            name="searchText"
+          />
+        </div>
+      </div>
+
+      <div class="filter-group">
+        <label for="brand-select">Marca</label>
+        <select
+          id="brand-select"
+          [ngModel]="selectedBrand()"
+          (ngModelChange)="selectedBrand.set($event)"
+          name="selectedBrand"
+          (change)="applyFilters()"
+        >
+          <option value="">Todas as marcas</option>
+          <option *ngFor="let brand of availableBrands()" [value]="brand">
+            {{ brand }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="min-year-input">Ano mínimo</label>
+        <input
+          id="min-year-input"
+          type="number"
+          placeholder="Ex: 2022"
+          [ngModel]="selectedMinYear()"
+          (ngModelChange)="selectedMinYear.set($event)"
+          name="selectedMinYear"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="max-price-input">Preço máximo (€)</label>
+        <input
+          id="max-price-input"
+          type="number"
+          placeholder="Ex: 300000"
+          [ngModel]="selectedMaxPrice()"
+          (ngModelChange)="selectedMaxPrice.set($event)"
+          name="selectedMaxPrice"
+        />
+      </div>
+
+      <div class="filter-actions">
+        <button type="submit" class="btn-filter-apply">Filtrar</button>
+        <button
+          type="button"
+          class="btn-filter-reset"
+          (click)="resetFilters()"
+          *ngIf="searchText() || selectedBrand() || selectedMinYear() || selectedMaxPrice()"
+        >
+          Limpar
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Mensagem de Erro com Retry -->
+  <div class="alert-error" *ngIf="errorMessage() as error">
+    <p>⚠️ {{ error }}</p>
+    <button type="button" (click)="retryLoad()" class="btn-retry">Tentar novamente</button>
+  </div>
+
+  <!-- Loading Skeleton -->
+  <div class="catalog-grid" *ngIf="isLoading()">
+    <div class="skeleton-card" *ngFor="let _ of [1, 2, 3, 4, 5, 6]">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-body">
+        <div class="skeleton-line skeleton-line--short"></div>
+        <div class="skeleton-line skeleton-line--title"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line skeleton-line--footer"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Catálogo de Veículos -->
+  <section class="catalog-section" *ngIf="!isLoading()">
+    <div class="catalog-header">
+      <h2>Estoque Disponível <span class="counter">({{ allVehicles().length }})</span></h2>
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="allVehicles().length === 0 && !errorMessage()">
+      <div class="empty-state__icon">🚗</div>
+      <h3>Nenhum veículo encontrado</h3>
+      <p>Tente ajustar os filtros de busca para encontrar o veículo desejado.</p>
+      <button type="button" class="btn-cta" (click)="resetFilters()">
+        Ver todo o estoque
+      </button>
+    </div>
+
+    <!-- Grade de Veículos -->
+    <div class="catalog-grid" *ngIf="allVehicles().length > 0">
+      <article class="vehicle-card" *ngFor="let vehicle of allVehicles()">
+        <div class="vehicle-card__media">
+          <img
+            [src]="vehicle.coverImageUrl | imageUrl"
+            [alt]="vehicle.title"
+            class="vehicle-card__img"
+            loading="lazy"
+            (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
+          />
+          <span class="badge-tag" *ngIf="vehicle.featured">Destaque</span>
+          <span class="badge-status">{{ vehicle.status === 'PUBLISHED' ? 'Disponível' : vehicle.status }}</span>
+        </div>
+
+        <div class="vehicle-card__body">
+          <div class="vehicle-card__top">
+            <span class="vehicle-card__brand">{{ vehicle.brand }} • {{ vehicle.model }}</span>
+            <h3 class="vehicle-card__title">{{ vehicle.title }}</h3>
+          </div>
+
+          <div class="specs-chips">
+            <span class="spec-chip">📅 {{ vehicle.year }}/{{ vehicle.modelYear }}</span>
+            <span class="spec-chip">🛣️ {{ formatMileage(vehicle.mileage) }}</span>
+            <span class="spec-chip">⚙️ {{ formatTransmission(vehicle.transmission) }}</span>
+            <span class="spec-chip">⛽ {{ formatFuel(vehicle.fuelType) }}</span>
+          </div>
+
+          <p class="vehicle-card__highlights" *ngIf="vehicle.highlights">
+            {{ vehicle.highlights }}
+          </p>
+
+          <div class="vehicle-card__footer">
+            <div class="vehicle-card__price">
+              <span class="price-prefix">Valor</span>
+              <strong>{{ vehicle.price | euro: vehicle.rawPrice }}</strong>
+            </div>
+            <a [routerLink]="['/detail', vehicle.slug]" class="btn-card-action">
+              Ver detalhes
+            </a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+</section>

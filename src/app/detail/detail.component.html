@@ -1,0 +1,218 @@
+<div class="detail-container">
+  <!-- Botão de Voltar -->
+  <nav class="detail-nav">
+    <a routerLink="/" class="btn-back">
+      &larr; Voltar para o estoque
+    </a>
+  </nav>
+
+  <!-- Loading State -->
+  <div class="detail-loading" *ngIf="isLoading()">
+    <div class="skeleton-media"></div>
+    <div class="skeleton-content">
+      <div class="skeleton-line skeleton-line--title"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line skeleton-line--price"></div>
+    </div>
+  </div>
+
+  <!-- Error State -->
+  <div class="alert-error" *ngIf="errorMessage() as err">
+    <h3>⚠️ Ops! Não encontramos o veículo</h3>
+    <p>{{ err }}</p>
+    <a routerLink="/" class="btn-cta">Ir para a página inicial</a>
+  </div>
+
+  <!-- Conteúdo Principal do Veículo -->
+  <article class="detail-card" *ngIf="!isLoading() && vehicle() as v">
+    <div class="detail-layout">
+      <!-- Coluna da Galeria -->
+      <div class="gallery-col">
+        <div class="gallery-main">
+          <img
+            [src]="selectedImageUrl() | imageUrl"
+            [alt]="v.title"
+            class="gallery-main__img"
+            (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
+          />
+          <span class="badge-tag" *ngIf="v.featured">★ Destaque</span>
+          <span class="badge-status">{{ v.status === 'PUBLISHED' ? 'Disponível' : v.status }}</span>
+        </div>
+
+        <!-- Thumbnails da Galeria -->
+        <div class="gallery-thumbs" *ngIf="v.images && v.images.length > 1">
+          <button
+            type="button"
+            class="thumb-btn"
+            *ngFor="let img of v.images"
+            [class.thumb-btn--active]="selectedImageUrl() === img.imageUrl"
+            (click)="selectImage(img.imageUrl)"
+          >
+            <img
+              [src]="img.imageUrl | imageUrl"
+              [alt]="v.title"
+              (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
+            />
+          </button>
+        </div>
+      </div>
+
+      <!-- Coluna de Informações e Compra -->
+      <div class="info-col">
+        <div class="vehicle-header">
+          <div class="vehicle-header__badges">
+            <span class="badge-brand">{{ v.brand }}</span>
+            <span class="badge-model">{{ v.model }}</span>
+            <span class="badge-version" *ngIf="v.version">{{ v.version }}</span>
+          </div>
+
+          <h1 class="vehicle-title">{{ v.title }}</h1>
+
+          <div class="vehicle-price-box">
+            <span class="price-label">Preço especial</span>
+            <strong class="price-value">{{ v.price | euro: v.rawPrice }}</strong>
+          </div>
+        </div>
+
+        <!-- Botão CTA Principal -->
+        <div class="action-buttons">
+          <button type="button" class="btn-primary" (click)="openLeadModal()">
+            💬 Enviar proposta / Falar com consultor
+          </button>
+        </div>
+
+        <!-- Ficha Técnica Resumida -->
+        <div class="specs-grid">
+          <div class="spec-item">
+            <span class="spec-label">Ano / Modelo</span>
+            <strong class="spec-value">{{ v.year }} / {{ v.modelYear }}</strong>
+          </div>
+
+          <div class="spec-item">
+            <span class="spec-label">Quilometragem</span>
+            <strong class="spec-value">{{ formatMileage(v.mileage) }}</strong>
+          </div>
+
+          <div class="spec-item">
+            <span class="spec-label">Câmbio</span>
+            <strong class="spec-value">{{ formatTransmission(v.transmission) }}</strong>
+          </div>
+
+          <div class="spec-item">
+            <span class="spec-label">Combustível</span>
+            <strong class="spec-value">{{ formatFuel(v.fuelType) }}</strong>
+          </div>
+
+          <div class="spec-item" *ngIf="v.color">
+            <span class="spec-label">Cor</span>
+            <strong class="spec-value">{{ v.color }}</strong>
+          </div>
+
+          <div class="spec-item" *ngIf="v.doors">
+            <span class="spec-label">Portas</span>
+            <strong class="spec-value">{{ v.doors }} Portas</strong>
+          </div>
+        </div>
+
+        <!-- Destaques e Opcionais -->
+        <div class="highlights-box" *ngIf="v.highlights">
+          <h3>Destaques & Opcionais</h3>
+          <p>{{ v.highlights }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Seção de Descrição Completa -->
+    <div class="description-section" *ngIf="v.description">
+      <h2>Descrição do Veículo</h2>
+      <p class="description-text">{{ v.description }}</p>
+    </div>
+  </article>
+
+  <!-- Modal de Formulário de Proposta / Lead -->
+  <div class="modal-overlay" *ngIf="showLeadModal()" (click)="closeLeadModal()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Proposta de Interesse</h2>
+        <button type="button" class="btn-close" (click)="closeLeadModal()">✕</button>
+      </div>
+
+      <!-- Sucesso de Envio -->
+      <div class="lead-feedback--success" *ngIf="leadSuccess() as successMsg">
+        <div class="feedback-icon">🎉</div>
+        <h3>Proposta Recebida!</h3>
+        <p>{{ successMsg }}</p>
+        <button type="button" class="btn-cta" (click)="closeLeadModal()">Concluir</button>
+      </div>
+
+      <!-- Formulário de Envio -->
+      <form class="lead-form" *ngIf="!leadSuccess()" (ngSubmit)="submitLead()">
+        <div class="lead-vehicle-summary" *ngIf="vehicle() as v">
+          <strong>{{ v.title }}</strong>
+          <span>{{ v.price | euro: v.rawPrice }}</span>
+        </div>
+
+        <div class="form-alert form-alert--error" *ngIf="leadError() as err">
+          ⚠️ {{ err }}
+        </div>
+
+        <div class="form-field">
+          <label for="lead-name">Nome completo *</label>
+          <input
+            id="lead-name"
+            type="text"
+            placeholder="Seu nome"
+            [(ngModel)]="leadForm.customerName"
+            name="customerName"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="lead-phone">Telefone / WhatsApp *</label>
+          <input
+            id="lead-phone"
+            type="tel"
+            placeholder="(DDD) 99999-9999"
+            [(ngModel)]="leadForm.phone"
+            name="phone"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="lead-email">E-mail (opcional)</label>
+          <input
+            id="lead-email"
+            type="email"
+            placeholder="seu.email@exemplo.com"
+            [(ngModel)]="leadForm.email"
+            name="email"
+          />
+        </div>
+
+        <div class="form-field">
+          <label for="lead-message">Mensagem ou proposta</label>
+          <textarea
+            id="lead-message"
+            rows="3"
+            placeholder="Escreva aqui suas dúvidas ou condições de proposta..."
+            [(ngModel)]="leadForm.message"
+            name="message"
+          ></textarea>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-cancel" (click)="closeLeadModal()" [disabled]="isSubmittingLead()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-submit" [disabled]="isSubmittingLead()">
+            <span *ngIf="!isSubmittingLead()">Enviar Proposta</span>
+            <span *ngIf="isSubmittingLead()">Enviando...</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
