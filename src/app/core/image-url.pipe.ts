@@ -9,7 +9,7 @@ declare global {
 export const API_BASE_URL =
   typeof window !== 'undefined' && window.STAND_API_URL
     ? window.STAND_API_URL
-    : 'http://localhost:8080';
+    : 'https://stand-backend-java.onrender.com';
 
 export function resolveImageUrl(url?: string | null): string {
   if (!url || !url.trim()) {

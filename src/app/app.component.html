@@ -8,27 +8,20 @@
       </a>
 
       <nav class="main-nav">
-        <a routerLink="/" routerLinkActive="nav-link--active" [routerLinkActiveOptions]="{ exact: true }" class="nav-link">
-          Estoque
-        </a>
 
-        <ng-container *ngIf="auth.isAuthenticated(); else loginLink">
-          <a routerLink="/admin" routerLinkActive="nav-link--active" class="nav-link nav-link--admin">
-            Painel Admin
-          </a>
-          <button type="button" class="btn-header-logout" (click)="logout()">
-            Sair
-          </button>
-        </ng-container>
-
-        <ng-template #loginLink>
-          <a routerLink="/admin/login" class="btn-header-admin">
-            🔒 Área Restrita
-          </a>
-        </ng-template>
       </nav>
     </div>
   </header>
+
+  <!-- Hero Banner Imersivo -->
+  <section class="hero-banner">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <span class="hero-tag">🔥 Stock Exclusivo</span>
+      <h1>Encontre o Seu Próximo Carro dos Sonhos</h1>
+      <p>Veículos desportivos, seminovos selecionados e elétricos com garantia total e rigor de inspeção.</p>
+    </div>
+  </section>
 
   <!-- Conteúdo Principal com Router Outlet -->
   <main class="app-main">
@@ -50,14 +43,14 @@
       <div class="footer-status">
         <div class="status-pill" [class.status-pill--online]="isBackendOnline() === true" [class.status-pill--offline]="isBackendOnline() === false">
           <span class="status-dot"></span>
-          <span *ngIf="isBackendOnline() === true">Backend Conectado (API 8080)</span>
-          <span *ngIf="isBackendOnline() === false">Backend Offline</span>
+          <span *ngIf="isBackendOnline() === true">System Online</span>
+          <span *ngIf="isBackendOnline() === false">System Offline</span>
           <span *ngIf="isBackendOnline() === null">Verificando API...</span>
         </div>
 
-        <a href="http://localhost:8080/swagger-ui/index.html" target="_blank" rel="noopener noreferrer" class="swagger-link">
-          📄 Documentação Swagger UI
-        </a>
+        <span class="footer-copyright">
+          © {{ currentYear }} Stand AutoMotors. Todos os direitos reservados.
+        </span>
       </div>
     </div>
   </footer>

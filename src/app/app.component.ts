@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterOutlet } from '@angular/router';
 import { AdminAuthService } from './core/admin-auth.service';
 import { ApiService } from './core/api.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterOutlet, RouterLink],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
@@ -15,6 +15,7 @@ export class AppComponent implements OnInit {
   readonly auth = inject(AdminAuthService);
   private readonly api = inject(ApiService);
   private readonly router = inject(Router);
+  currentYear: number = new Date().getFullYear();
 
   readonly isBackendOnline = signal<boolean | null>(null);
 
