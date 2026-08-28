@@ -232,14 +232,20 @@
 
 .hero-banner {
   position: relative;
-  width: 100%;
+  width: 94%;
+  margin: 0 auto 2rem auto; /* Centraliza e adiciona margem inferior */
+  
+  /* Cantos arredondados idênticos aos dos quadros dos carros */
+  border-radius: 20px;
+  overflow: hidden;
+
   min-height: 160px; 
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   padding: 2rem 1rem;
-  // Imagem externa
+  
   background-image: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1920&auto=format&fit=crop');
   background-size: cover;
   background-position: center 40%;
@@ -247,6 +253,7 @@
   @media (min-width: 768px) {
     min-height: 220px;
     padding: 2.5rem 2rem;
+    border-radius: 24px; /* Bordas um pouco mais suaves no desktop */
   }
 
   .hero-overlay {
