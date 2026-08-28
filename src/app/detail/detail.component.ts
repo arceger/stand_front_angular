@@ -160,4 +160,23 @@ export class DetailComponent implements OnInit {
   formatTransmission(trans: string | undefined): string {
     return trans === 'AUTOMATIC' ? 'Automático' : 'Manual';
   }
+// Método para avançar para a próxima imagem ao clicar na foto principal
+nextImage(): void {
+  const v = this.vehicle();
+  if (!v || !v.images || v.images.length <= 1) return;
+
+  const currentIndex = v.images.findIndex(img => img.imageUrl === this.selectedImageUrl());
+  const nextIndex = (currentIndex + 1) % v.images.length;
+  this.selectedImageUrl.set(v.images[nextIndex].imageUrl);
+}
+
+// Método para voltar para a imagem anterior
+prevImage(): void {
+  const v = this.vehicle();
+  if (!v || !v.images || v.images.length <= 1) return;
+
+  const currentIndex = v.images.findIndex(img => img.imageUrl === this.selectedImageUrl());
+  const prevIndex = (currentIndex - 1 + v.images.length) % v.images.length;
+  this.selectedImageUrl.set(v.images[prevIndex].imageUrl);
+}
 }

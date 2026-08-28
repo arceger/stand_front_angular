@@ -233,13 +233,13 @@
 .hero-banner {
   position: relative;
   width: 100%;
-  min-height: 180px; // Reduzido para não dominar a ecrã
+  min-height: 160px; 
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   padding: 2rem 1rem;
-  // Imagem focada num carro desportivo premium / farol em tom dark
+  // Imagem externa
   background-image: url('https://images.unsplash.com/photo-1503376780353-7e6692767b70?q=80&w=1920&auto=format&fit=crop');
   background-size: cover;
   background-position: center 40%;
@@ -252,7 +252,6 @@
   .hero-overlay {
     position: absolute;
     inset: 0;
-    // Gradiente mais escuro para garantir leitura fácil e destacar os carros abaixo
     background: linear-gradient(180deg, rgba(15, 23, 42, 0.85) 0%, rgba(15, 23, 42, 0.95) 100%);
   }
 

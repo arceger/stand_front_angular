@@ -597,3 +597,42 @@
     background-position: -200% 0;
   }
 }
+
+// Links de imagem do Hero e do Catálogo
+.hero-card__media-link,
+.vehicle-card__media-link {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+// Animação de Zoom suave na foto ao passar o cursor
+.hero-card__media,
+.vehicle-card__media {
+  overflow: hidden;
+  position: relative;
+
+  .hero-card__img,
+  .vehicle-card__img {
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  &:hover {
+    .hero-card__img,
+    .vehicle-card__img {
+      transform: scale(1.04);
+    }
+  }
+}
+
+// Link no título do veículo
+.title-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: #2563eb; // ou a cor primária do teu tema
+  }
+}
