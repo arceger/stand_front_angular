@@ -17,14 +17,18 @@ export class AdminLoginComponent {
   private readonly auth = inject(AdminAuthService);
   private readonly router = inject(Router);
 
-  email = 'admin@stand.local';
-  password = 'Admin123!';
+  // Campos limpos por defeito
+  email = signal<string>('');
+  password = signal<string>('');
 
   readonly isLoading = signal<boolean>(false);
   readonly errorMessage = signal<string | null>(null);
 
   submitLogin(): void {
-    if (!this.email.trim() || !this.password) {
+    const emailVal = this.email().trim();
+    const passwordVal = this.password();
+
+    if (!emailVal || !passwordVal) {
       this.errorMessage.set('Preencha o e-mail e a senha.');
       return;
     }
@@ -32,7 +36,7 @@ export class AdminLoginComponent {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.api.login(this.email.trim(), this.password).subscribe({
+    this.api.login(emailVal, passwordVal).subscribe({
       next: (response) => {
         this.isLoading.set(false);
         this.auth.setSession(response.token, response.fullName);
@@ -49,4 +53,3 @@ export class AdminLoginComponent {
     });
   }
 }
-

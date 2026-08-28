@@ -29,7 +29,12 @@
     <div class="detail-layout">
       <!-- Coluna da Galeria -->
       <div class="gallery-col">
-        <div class="gallery-main">
+        <div 
+          class="gallery-main" 
+          [class.gallery-main--interactive]="v.images && v.images.length > 1"
+          (click)="nextImage()"
+          title="Clique para ver a próxima imagem"
+        >
           <img
             [src]="selectedImageUrl() | imageUrl"
             [alt]="v.title"
@@ -38,6 +43,29 @@
           />
           <span class="badge-tag" *ngIf="v.featured">★ Destaque</span>
           <span class="badge-status">{{ v.status === 'PUBLISHED' ? 'Disponível' : v.status }}</span>
+
+          <!-- Controlo visual de setas e indicador quando há múltiplas fotos -->
+          <ng-container *ngIf="v.images && v.images.length > 1">
+            <button 
+              type="button" 
+              class="gallery-arrow gallery-arrow--prev" 
+              (click)="$event.stopPropagation(); prevImage()"
+              aria-label="Imagem anterior"
+            >
+              ❮
+            </button>
+            <button 
+              type="button" 
+              class="gallery-arrow gallery-arrow--next" 
+              (click)="$event.stopPropagation(); nextImage()"
+              aria-label="Próxima imagem"
+            >
+              ❯
+            </button>
+            <span class="gallery-counter">
+              📸 Clique na foto para avançar
+            </span>
+          </ng-container>
         </div>
 
         <!-- Thumbnails da Galeria -->

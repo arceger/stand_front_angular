@@ -2,15 +2,18 @@
   <!-- Destaque Principal / Hero Card -->
   <section class="hero-section" *ngIf="mainFeatured() as hero">
     <div class="hero-card">
-      <div class="hero-card__media">
-        <img
-          [src]="hero.coverImageUrl | imageUrl"
-          [alt]="hero.title"
-          class="hero-card__img"
-          (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
-        />
-        <span class="badge-featured" *ngIf="hero.featured">★ Destaque</span>
-      </div>
+      <!-- Imagem do Hero tornada clicável -->
+      <a [routerLink]="['/detail', hero.slug]" class="hero-card__media-link">
+        <div class="hero-card__media">
+          <img
+            [src]="hero.coverImageUrl | imageUrl"
+            [alt]="hero.title"
+            class="hero-card__img"
+            (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
+          />
+          <span class="badge-featured" *ngIf="hero.featured">★ Destaque</span>
+        </div>
+      </a>
 
       <div class="hero-card__info">
         <div class="hero-card__header">
@@ -18,7 +21,9 @@
           <span class="vehicle-brand">{{ hero.brand }}</span>
         </div>
 
-        <h1 class="hero-card__title">{{ hero.title }}</h1>
+        <h1 class="hero-card__title">
+          <a [routerLink]="['/detail', hero.slug]" class="title-link">{{ hero.title }}</a>
+        </h1>
         <p class="hero-card__meta">
           <span>Ano: {{ hero.year }}/{{ hero.modelYear }}</span>
           <span>•</span>
@@ -156,22 +161,27 @@
     <!-- Grade de Veículos -->
     <div class="catalog-grid" *ngIf="allVehicles().length > 0">
       <article class="vehicle-card" *ngFor="let vehicle of allVehicles()">
-        <div class="vehicle-card__media">
-          <img
-            [src]="vehicle.coverImageUrl | imageUrl"
-            [alt]="vehicle.title"
-            class="vehicle-card__img"
-            loading="lazy"
-            (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
-          />
-          <span class="badge-tag" *ngIf="vehicle.featured">Destaque</span>
-          <span class="badge-status">{{ vehicle.status === 'PUBLISHED' ? 'Disponível' : vehicle.status }}</span>
-        </div>
+        <!-- Imagem do Card tornada clicável -->
+        <a [routerLink]="['/detail', vehicle.slug]" class="vehicle-card__media-link">
+          <div class="vehicle-card__media">
+            <img
+              [src]="vehicle.coverImageUrl | imageUrl"
+              [alt]="vehicle.title"
+              class="vehicle-card__img"
+              loading="lazy"
+              (error)="$any($event.target).src = '/illustrations/vehicle-placeholder.svg'"
+            />
+            <span class="badge-tag" *ngIf="vehicle.featured">Destaque</span>
+            <span class="badge-status">{{ vehicle.status === 'PUBLISHED' ? 'Disponível' : vehicle.status }}</span>
+          </div>
+        </a>
 
         <div class="vehicle-card__body">
           <div class="vehicle-card__top">
             <span class="vehicle-card__brand">{{ vehicle.brand }} • {{ vehicle.model }}</span>
-            <h3 class="vehicle-card__title">{{ vehicle.title }}</h3>
+            <h3 class="vehicle-card__title">
+              <a [routerLink]="['/detail', vehicle.slug]" class="title-link">{{ vehicle.title }}</a>
+            </h3>
           </div>
 
           <div class="specs-chips">
