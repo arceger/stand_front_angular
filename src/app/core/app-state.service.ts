@@ -40,7 +40,7 @@ export class AppStateService {
         error: (err) => {
           console.error('Falha ao carregar catálogo da API:', err);
           this.error.set(
-            'Não foi possível carregar os veículos do estoque. Verifique a conexão com o backend.'
+            'Não foi possível carregar os veículos, Verifique a conexão.'
           );
           this.isLoading.set(false);
           resolve([]);
