@@ -9,7 +9,7 @@ declare global {
 export const API_BASE_URL =
   typeof window !== 'undefined' && window.STAND_API_URL
     ? window.STAND_API_URL
-    : 'https://stand-backend-java.onrender.com';
+    : 'https://automotors-back.onrender.com';
 
 // export const API_BASE_URL =
 //   typeof window !== 'undefined' && window.STAND_API_URL
